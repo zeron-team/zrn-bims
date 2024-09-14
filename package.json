@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "axios": "^1.7.7",
+    "highcharts": "^11.4.8",
+    "highcharts-react-official": "^3.2.1",
+    "jwt-decode": "^4.0.0",
+    "react-router-dom": "^6.26.2"
+  }
+}

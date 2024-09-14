@@ -113,6 +113,21 @@ npx create-react-app frontend
 ```
 - ### DEPENDENCIAS FRONTEND
 
-- ```js
-    npm install axios react-router-dom highcharts highcharts-react-official jwt-decode
-  ```
+    ```js
+        npm install axios react-router-dom highcharts highcharts-react-official jwt-decode
+    ```
+
+## INICIO
+
+Probar la Comunicación:
+
+Iniciar el backend:
+
+```bash
+uvicorn app.main:app --reload
+```
+Iniciar el frontend:
+```bash
+npm start
+```
+Verificar que el frontend puede comunicarse con el backend realizando operaciones de login, registro, y visualización de gráficos.
