@@ -97,5 +97,11 @@ bi_system/
 ├── docker-compose.yml
 └── README.md
 
+```
+## LIBRERIAS
 
+instalar dependencias
+
+```python
+pip install -r requirements.txt
 ```

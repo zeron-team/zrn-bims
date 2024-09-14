@@ -1,6 +1,10 @@
-Flask==2.0.1
-Flask-JWT-Extended==4.3.1
-PyMySQL==1.0.2  # MySQL
-psycopg2==2.9.1  # PostgreSQL
-pymongo==3.11.4  # MongoDB
-pyodbc==4.0.30  # SQLServer
+fastapi
+uvicorn
+SQLAlchemy
+alembic
+python-jose[cryptography]
+passlib[bcrypt]
+pymysql
+psycopg2
+pymongo
+pydantic
