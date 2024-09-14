@@ -1,3 +1,5 @@
+# backend/app/schemas/user.py
+
 from pydantic import BaseModel
 
 class UserCreate(BaseModel):
@@ -11,4 +13,4 @@ class UserOut(BaseModel):
     role: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # Actualizado de orm_mode

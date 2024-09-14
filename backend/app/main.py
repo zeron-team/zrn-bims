@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-# Importa los routers desde tu estructura
-from routers import auth, charts, admin
+from app.routers import auth, charts, admin
 
 # Crear instancia de la aplicación FastAPI
 app = FastAPI()
