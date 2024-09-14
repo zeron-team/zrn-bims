@@ -111,7 +111,7 @@ pip install -r requirements.txt
 ```js
 npx create-react-app frontend
 ```
-### DEPENDENCIAS FRONTEND
+- ### DEPENDENCIAS FRONTEND
 
 - ```js
     npm install axios react-router-dom highcharts highcharts-react-official jwt-decode
