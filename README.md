@@ -105,3 +105,9 @@ instalar dependencias
 ```python
 pip install -r requirements.txt
 ```
+
+## FRONTEND
+
+```js
+npx create-react-app frontend
+```
