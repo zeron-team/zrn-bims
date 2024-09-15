@@ -1,23 +1,21 @@
 import React, { useContext } from 'react';
-import { Route, Redirect } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
-const PrivateRoute = ({ component: Component, roles, ...rest }) => {
+const PrivateRoute = ({ roles }) => {
     const { user } = useContext(AuthContext);
-    return (
-        <Route
-            {...rest}
-            render={props => {
-                if (!user) {
-                    return <Redirect to="/login" />;
-                }
-                if (roles && !roles.includes(user.role)) {
-                    return <Redirect to="/" />;
-                }
-                return <Component {...props} />;
-            }}
-        />
-    );
+
+    // Si el usuario no está autenticado, redirigir a la página de login
+    if (!user) {
+        return <Navigate to="/login" />;
+    }
+
+    // Si el usuario no tiene los roles correctos, redirigir a la página principal
+    if (roles && !roles.includes(user.role)) {
+        return <Navigate to="/" />;
+    }
+
+    return <Outlet />;
 };
 
 export default PrivateRoute;

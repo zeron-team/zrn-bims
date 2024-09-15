@@ -131,3 +131,15 @@ Iniciar el frontend:
 npm start
 ```
 Verificar que el frontend puede comunicarse con el backend realizando operaciones de login, registro, y visualización de gráficos.
+
+## USUARIOS
+
+- Administrador:
+
+    - Username: admin
+    - Password: password
+
+- Visualizador:
+
+    - Username: viewer
+    - Password: password
