@@ -107,7 +107,7 @@ bi_system/
 pip install -r requirements.txt
 ```
 ### REACTJS (package.json)
-    ```json
+```json
 {
   "name": "zeron_bi_frontend",
   "version": "1.0.0",
@@ -148,10 +148,10 @@ pip install -r requirements.txt
     ]
   }
 }
-    ```
-    ``` bash
-    npm install
-    ```
+```
+``` bash
+npm install
+```
 
 ## FRONTEND
 
