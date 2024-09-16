@@ -1,5 +1,4 @@
-//frontend/src/pages/LoginPage.js
-
+// frontend/src/pages/LoginPage.js
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -18,11 +17,11 @@ const LoginPage = () => {
         e.preventDefault();
         login(form.username, form.password)
             .then(() => {
-                navigate('/dashboard'); // Redirige al Dashboard después de iniciar sesión
+                navigate('/dashboard'); // Redirigir al Dashboard después de iniciar sesión
             })
             .catch(error => {
                 console.error(error);
-                alert('Credenciales inválidas');
+                alert('Credenciales inválidas'); // Asegúrate de que esto solo aparezca si el error es real
             });
     };
 

@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.core.database import get_db
+from app.core.database import get_db, SessionLocal  # Importar SessionLocal
 from app.models.user import User
 from app.schemas.user import UserCreate, UserOut
 from app.utils import hash_password, verify_password, create_access_token
@@ -35,7 +35,7 @@ def get_db():
 def register(user: UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.username == user.username).first()
     if db_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
+        raise HTTPException(status_code=400, detail="El nombre de usuario ya está registrado.")
     hashed_pw = hash_password(user.password)
     new_user = User(username=user.username, hashed_password=hashed_pw, role=user.role)
     db.add(new_user)
@@ -47,20 +47,30 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 @router.post("/login")
 def login(user_data: UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.username == user_data.username).first()
+    
+    # Imprime los detalles para asegurarte de que los datos son correctos
+    if db_user:
+        print(f"Usuario encontrado: {db_user.username}")
+        print(f"Contraseña hash en la base de datos: {db_user.hashed_password}")
+        print(f"Contraseña ingresada: {user_data.password}")
+
     if not db_user or not verify_password(user_data.password, db_user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": db_user.username, "role": db_user.role},
         expires_delta=access_token_expires
     )
+    
     return {"access_token": access_token, "token_type": "bearer"}
+
 
 # Obtener usuario actual usando el token JWT
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="No se pudo validar las credenciales.",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -78,10 +88,10 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 # Decorador para verificar si es administrador
 def admin_required(current_user: dict = Depends(get_current_user)):
     if current_user.get("role") != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Acceso de administrador requerido.")
     return current_user
 
 # Ruta protegida para administradores
 @router.get("/admin-only")
 def admin_only_route(current_user: dict = Depends(admin_required)):
-    return {"message": f"Hello {current_user['username']}, you have admin access!"}
+    return {"message": f"Hola {current_user['username']}, tienes acceso de administrador."}

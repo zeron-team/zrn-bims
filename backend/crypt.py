@@ -1,5 +1,8 @@
-import bcrypt
+from passlib.context import CryptContext
 
-password = "admin123"
-hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-print(hashed_password.decode('utf-8'))
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# Generar el hash de una nueva contraseña
+new_password = "prueba"
+hashed_password = pwd_context.hash(new_password)
+print(hashed_password)
