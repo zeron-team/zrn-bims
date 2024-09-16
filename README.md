@@ -143,3 +143,67 @@ Verificar que el frontend puede comunicarse con el backend realizando operacione
 
     - Username: viewer
     - Password: password
+
+## GIT
+- git add .
+- git commit -m "beta 0.11.0.240915"
+- git push -u origin master
+
+## DATABASE
+
+- usuarios
+``` sql
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    hashed_password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'viewer') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+``` sql
+-- Insertar un usuario admin
+INSERT INTO usuarios (username, hashed_password, role) 
+VALUES ('admin', 'hashed_password_aqui', 'admin');
+
+-- Insertar un usuario viewer
+INSERT INTO usuarios (username, hashed_password, role) 
+VALUES ('viewer', 'hashed_password_aqui', 'viewer');
+```
+
+- paginas
+``` sql
+CREATE TABLE paginas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    contenido TEXT NOT NULL,
+    estado ENUM('activo', 'inactivo') DEFAULT 'activo',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
+``` sql
+-- Insertar una página de prueba
+INSERT INTO paginas (nombre, contenido, estado) 
+VALUES ('Página de Ejemplo', 'Contenido de la página', 'activo');
+```
+
+- db_conecciones
+``` sql
+CREATE TABLE db_connections (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    db_type ENUM('mysql', 'postgresql', 'sqlserver', 'mongodb') NOT NULL,
+    host VARCHAR(100) NOT NULL,
+    port INT NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    db_name VARCHAR(100) NOT NULL,  -- Cambiar "database" a "db_name"
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+``` sql
+-- Insertar una conexión de base de datos
+INSERT INTO db_connections (name, db_type, host, port, username, password, database) 
+VALUES ('Conexión MySQL', 'mysql', 'localhost', 3306, 'root', 'password', 'mi_base_de_datos');
+```

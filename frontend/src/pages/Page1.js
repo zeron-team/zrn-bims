@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useContext } from 'react';
+//frontend/src/pages/Page1.js
+
+import React, { useEffect, useState } from 'react'; // 'user' eliminado
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { getChartData } from '../services/chartService';
-import { AuthContext } from '../context/AuthContext';
 
 const Page1 = () => {
     const [options, setOptions] = useState({});
-    const { user } = useContext(AuthContext);
     const token = localStorage.getItem('token');
 
     useEffect(() => {

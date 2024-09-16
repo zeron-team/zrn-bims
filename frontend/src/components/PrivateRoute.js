@@ -1,21 +1,24 @@
+//frontend/src/components/PrivateRoute.js
+
 import React, { useContext } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
-const PrivateRoute = ({ roles }) => {
+const PrivateRoute = ({ children, roles }) => {
     const { user } = useContext(AuthContext);
 
-    // Si el usuario no está autenticado, redirigir a la página de login
     if (!user) {
+        // Si el usuario no está autenticado, redirigir al login
         return <Navigate to="/login" />;
     }
 
-    // Si el usuario no tiene los roles correctos, redirigir a la página principal
     if (roles && !roles.includes(user.role)) {
-        return <Navigate to="/" />;
+        // Si el usuario no tiene el rol correcto, redirigir al dashboard
+        return <Navigate to="/dashboard" />;
     }
 
-    return <Outlet />;
+    // Si está autenticado y tiene el rol correcto, renderizar el componente
+    return children;
 };
 
 export default PrivateRoute;
