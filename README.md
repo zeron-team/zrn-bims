@@ -100,11 +100,58 @@ bi_system/
 ```
 ## LIBRERIAS
 
-instalar dependencias
+### Python
+    - instalar dependencias
 
 ```python
 pip install -r requirements.txt
 ```
+### REACTJS (package.json)
+    ```json
+{
+  "name": "zeron_bi_frontend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "axios": "^1.2.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.11.0",
+    "fastapi": "^0.95.0",
+    "bcrypt": "^5.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "eslint": "^8.25.0",
+    "eslint-config-react-app": "^7.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.6.1",
+    "eslint-plugin-react": "^7.31.10",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "react-scripts": "^5.0.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
+    ```
+    ``` bash
+    npm install
+    ```
 
 ## FRONTEND
 
