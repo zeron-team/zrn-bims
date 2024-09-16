@@ -2,26 +2,25 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.core.database import SessionLocal
+from app.core.database import get_db
 from app.models.user import User
 from app.schemas.user import UserCreate, UserOut
 from app.utils import hash_password, verify_password, create_access_token
 from jose import JWTError, jwt
-from datetime import datetime, timedelta
+from datetime import timedelta
 from fastapi.security import OAuth2PasswordBearer
 
-# Definiciones y configuración del JWT
+# JWT configurations
 SECRET_KEY = "292125eb01efff1483ed66df751d5ccd7050a433b9b775d443729520293a516f"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-# Ruta para autenticación
 router = APIRouter(
     prefix="/auth",
     tags=["auth"]
 )
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 # Obtener la sesión de base de datos
 def get_db():
@@ -31,7 +30,7 @@ def get_db():
     finally:
         db.close()
 
-# Registrar un nuevo usuario
+# Registro de usuarios
 @router.post("/register", response_model=UserOut)
 def register(user: UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.username == user.username).first()
@@ -44,20 +43,20 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
     return new_user
 
-# Inicio de sesión del usuario y generación del token JWT
+# Inicio de sesión y generación de token JWT
 @router.post("/login")
-def login(form_data: UserCreate, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == form_data.username).first()
-    if not user or not verify_password(form_data.password, user.hashed_password):
+def login(user_data: UserCreate, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.username == user_data.username).first()
+    if not db_user or not verify_password(user_data.password, db_user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username, "role": user.role},
+        data={"sub": db_user.username, "role": db_user.role},
         expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-# Obtener el usuario actual a partir del token
+# Obtener usuario actual usando el token JWT
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -76,7 +75,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     except JWTError:
         raise credentials_exception
 
-# Decorador para verificar que el usuario es administrador
+# Decorador para verificar si es administrador
 def admin_required(current_user: dict = Depends(get_current_user)):
     if current_user.get("role") != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
