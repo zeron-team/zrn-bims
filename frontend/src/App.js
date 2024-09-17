@@ -12,6 +12,7 @@ import Page2 from './pages/Page2';
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import PageView from './components/PageView'; // Componente para ver una página específica
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function App() {
     return (
