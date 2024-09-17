@@ -3,13 +3,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { getPages } from '../services/pageService'; // Para obtener las páginas creadas dinámicamente
+import { getPages } from '../services/pageService';
 import styles from '../css/Layout.module.css';
 
 const Layout = ({ children }) => {
     const { user } = useContext(AuthContext);
     const [pages, setPages] = useState([]);
-    const [showSubMenu, setShowSubMenu] = useState(false); // Controlar el despliegue del submenú
+    const [showSubMenu, setShowSubMenu] = useState(false);
 
     useEffect(() => {
         getPages()
@@ -18,7 +18,7 @@ const Layout = ({ children }) => {
     }, []);
 
     const toggleSubMenu = () => {
-        setShowSubMenu(!showSubMenu); // Alterna la visibilidad del submenú
+        setShowSubMenu(!showSubMenu);
     };
 
     return (
@@ -56,7 +56,13 @@ const Layout = ({ children }) => {
                                     </Link>
                                 </li>
 
-                                {/* Carpeta de nuevas páginas */}
+                                {/* Nuevo enlace para gestión de DB */}
+                                <li>
+                                    <Link to="/manage-db" className={styles.navLink}>
+                                        <i className="fas fa-database"></i> Gestión de DB
+                                    </Link>
+                                </li>
+
                                 <li className={styles.folder} onClick={toggleSubMenu}>
                                     <div className={styles.folderTitle}>
                                         <i className="fas fa-folder"></i> Páginas Nuevas

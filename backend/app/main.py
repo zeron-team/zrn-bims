@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import auth, charts, admin, users, pages  # Importar correctamente todos los routers
 from app.models.page import Page  # Importa el modelo Page para la creación de la tabla
 from app.core.database import engine  # Importa el engine para la conexión de la base de datos
+from app.routers import db  # Importa tu router de la base de datos
 
 # Crear instancia de la aplicación FastAPI
 app = FastAPI()
@@ -34,6 +35,7 @@ app.include_router(auth.router)
 app.include_router(charts.router)
 app.include_router(admin.router)
 app.include_router(users.router)  # Asegúrate de incluir este router
+app.include_router(db.router) # Incluye el router
 
 # Endpoint básico para verificar que la API funciona
 @app.get("/")
