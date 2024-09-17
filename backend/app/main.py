@@ -2,10 +2,18 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, charts, admin, users  # Asegúrate de importar el router de usuarios
+from app.routers import auth, charts, admin, users, pages  # Importar correctamente todos los routers
+from app.models.page import Page  # Importa el modelo Page para la creación de la tabla
+from app.core.database import engine  # Importa el engine para la conexión de la base de datos
 
 # Crear instancia de la aplicación FastAPI
 app = FastAPI()
+
+# Crea las tablas en la base de datos si no existen
+Page.metadata.create_all(bind=engine)
+
+# Incluir el router de páginas correctamente
+app.include_router(pages.router)
 
 # Configuración del middleware CORS
 origins = [
