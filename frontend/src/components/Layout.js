@@ -10,6 +10,7 @@ const Layout = ({ children }) => {
     const { user } = useContext(AuthContext);
     const [pages, setPages] = useState([]);
     const [showSubMenu, setShowSubMenu] = useState(false);
+    const [showAdminMenu, setShowAdminMenu] = useState(false); // Estado para submenú de Administración
 
     useEffect(() => {
         getPages()
@@ -21,75 +22,71 @@ const Layout = ({ children }) => {
         setShowSubMenu(!showSubMenu);
     };
 
+    const toggleAdminMenu = () => {
+        setShowAdminMenu(!showAdminMenu);
+    };
+
     return (
         <div className={styles.container}>
             <aside className={styles.sidebar}>
                 <h2 className={styles.menuTitle}>Menú</h2>
                 <nav className={styles.navMenu}>
                     <ul>
-                        <li>
+                        {/* 1. Inicio */}
                             <Link to="/dashboard" className={styles.navLink}>
                                 <i className="fas fa-home"></i> Inicio
                             </Link>
+                        {/* 2. Páginas Nuevas */}
+                        <li className={styles.folder} onClick={toggleSubMenu}>
+                            <div className={styles.folderTitle}>
+                                <i className="fas fa-folder"></i> Páginas Nuevas
+                            </div>
+                            <i className={`${styles.chevron} ${showSubMenu ? 'fas fa-chevron-down' : 'fas fa-chevron-right'}`}></i>
                         </li>
-                        <li>
-                            <Link to="/page1" className={styles.navLink}>
-                                <i className="fas fa-file-alt"></i> Página 1
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/page2" className={styles.navLink}>
-                                <i className="fas fa-file-alt"></i> Página 2
-                            </Link>
-                        </li>
+                        <ul className={`${styles.subMenu} ${showSubMenu ? styles.showSubMenu : ''}`}>
+                            {pages.length > 0 ? (
+                                pages.map(page => (
+                                    <li key={page.id}>
+                                        <Link to={`/page/${page.id}`} className={styles.subNavLink}>
+                                            <i className="fas fa-file-alt"></i> {page.nombre}
+                                        </Link>
+                                    </li>
+                                ))
+                            ) : (
+                                <li className={styles.noPagesMessage}>No hay páginas creadas</li>
+                            )}
+                        </ul>
 
+                        {/* 3. Administración */}
                         {user?.role === 'admin' && (
                             <>
-                                <li>
-                                    <Link to="/admin" className={styles.navLink}>
-                                        <i className="fas fa-user-shield"></i> Administración
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link to="/manage-pages" className={styles.navLink}>
-                                        <i className="fas fa-folder-open"></i> Gestionar Páginas
-                                    </Link>
-                                </li>
-
-                                {/* Nuevo enlace para gestión de DB */}
-                                <li>
-                                    <Link to="/manage-db" className={styles.navLink}>
-                                        <i className="fas fa-database"></i> Gestión de DB
-                                    </Link>
-                                </li>
-
-                                <li className={styles.folder} onClick={toggleSubMenu}>
+                                <li className={styles.folder} onClick={toggleAdminMenu}>
                                     <div className={styles.folderTitle}>
-                                        <i className="fas fa-folder"></i> Páginas Nuevas
+                                        <i className="fas fa-user-shield"></i> Administración
                                     </div>
-                                    <i className={`${styles.chevron} ${showSubMenu ? 'fas fa-chevron-down' : 'fas fa-chevron-right'}`}></i>
+                                    <i className={`${styles.chevron} ${showAdminMenu ? 'fas fa-chevron-down' : 'fas fa-chevron-right'}`}></i>
                                 </li>
-                                <ul className={`${styles.subMenu} ${showSubMenu ? styles.showSubMenu : ''}`}>
-                                    {pages.length > 0 ? (
-                                        pages.map(page => (
-                                            <li key={page.id}>
-                                                <Link to={`/page/${page.id}`} className={styles.subNavLink}>
-                                                    <i className="fas fa-file-alt"></i> {page.nombre}
-                                                </Link>
-                                            </li>
-                                        ))
-                                    ) : (
-                                        <li className={styles.noPagesMessage}>No hay páginas creadas</li>
-                                    )}
+                                <ul className={`${styles.subMenu} ${showAdminMenu ? styles.showSubMenu : ''}`}>
+                                    {/* 3A. Gestionar Páginas */}
+                                        <Link to="/manage-pages" className={styles.navLink}>
+                                            <i className="fas fa-folder-open"></i> Gestionar Páginas
+                                        </Link>
+                                    {/* 3B. Gestión de DB */}
+                                        <Link to="/manage-db" className={styles.navLink}>
+                                            <i className="fas fa-database"></i> Gestión de DB
+                                        </Link>
+                                    {/* 3C. Gestión de Usuarios */}
+                                        <Link to="/manage-users" className={styles.navLink}>
+                                            <i className="fas fa-users"></i> Gestión de Usuarios
+                                        </Link>
                                 </ul>
                             </>
                         )}
 
-                        <li>
+                        {/* 4. Cerrar Sesión */}
                             <Link to="/login" className={styles.navLink}>
                                 <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
                             </Link>
-                        </li>
                     </ul>
                 </nav>
             </aside>

@@ -1,5 +1,5 @@
 .container {
-    max-width: 600px;
+    max-width: 800px;
     margin: 0 auto;
     padding: 20px;
 }
@@ -45,4 +45,51 @@
 
 .success {
     color: green;
+}
+
+.connectionTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.connectionTable th, .connectionTable td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.connectionTable th {
+    background-color: #007bff;
+    color: white;
+}
+
+.connectionTable td {
+    font-size: 14px;
+}
+
+.tableHeader {
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.tableHeader span {
+    margin-right: 10px;
+    font-size: 1.2rem;
+    color: #007bff;
+}
+
+.columnList {
+    list-style: none;
+    padding-left: 20px;
+    margin-top: 5px;
+}
+
+.columnList li {
+    padding: 5px 0;
+    font-size: 0.95rem;
 }
