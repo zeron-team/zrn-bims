@@ -1,7 +1,7 @@
 // frontend/src/components/ManagePages.js
 
 import React, { useState, useEffect } from 'react';
-import { getPages, createPage, updatePage, deletePage } from '../services/pageService';
+import { getPages, createPage, updatePage, deletePage } from '../services/pageService'; // Elimina la importación de 'getPage'
 import { Link } from 'react-router-dom'; // Asegúrate de importar Link
 import Layout from '../components/Layout';
 import styles from '../css/ManagePages.module.css';

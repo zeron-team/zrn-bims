@@ -1,10 +1,28 @@
-// frontend/src/services/pageService.js:
+// frontend/src/services/pageService.js
 
 import axios from 'axios';
 
-const API_URL = "http://localhost:8000/api/pages";
+// Obtener la lista de páginas
+export const getPages = async () => {
+    return await axios.get('http://localhost:8000/api/pages');
+};
 
-export const getPages = () => axios.get(`${API_URL}/`);
-export const createPage = (data) => axios.post(`${API_URL}/`, data);
-export const updatePage = (id, data) => axios.put(`${API_URL}/${id}`, data);
-export const deletePage = (id) => axios.delete(`${API_URL}/${id}`);
+// Obtener una página específica por ID
+export const getPage = async (id) => {
+    return await axios.get(`http://localhost:8000/api/pages/${id}`);
+};
+
+// Crear una nueva página
+export const createPage = async (pageData) => {
+    return await axios.post('http://localhost:8000/api/pages', pageData);
+};
+
+// Actualizar una página existente
+export const updatePage = async (id, pageData) => {
+    return await axios.put(`http://localhost:8000/api/pages/${id}`, pageData);
+};
+
+// Eliminar una página por ID
+export const deletePage = async (id) => {
+    return await axios.delete(`http://localhost:8000/api/pages/${id}`);
+};

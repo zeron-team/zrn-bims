@@ -10,6 +10,7 @@ import ManagePages from './pages/ManagePages';
 import ManageDB from './pages/ManageDB'; // Importar la nueva página
 import Page1 from './pages/Page1';
 import Page2 from './pages/Page2';
+import DynamicPage from './pages/DynamicPage'; // Importar el componente para páginas dinámicas
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 
@@ -30,6 +31,9 @@ function App() {
 
                     <Route path="/page1" element={<PrivateRoute><Page1 /></PrivateRoute>} />
                     <Route path="/page2" element={<PrivateRoute><Page2 /></PrivateRoute>} />
+
+                    {/* Ruta dinámica para páginas nuevas */}
+                    <Route path="/page/:id" element={<PrivateRoute><DynamicPage /></PrivateRoute>} />
                 </Routes>
             </Router>
         </AuthProvider>
