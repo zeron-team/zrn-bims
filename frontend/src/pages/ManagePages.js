@@ -5,6 +5,8 @@ import { getPages, createPage, updatePage, deletePage } from '../services/pageSe
 import { Link } from 'react-router-dom'; // Asegúrate de importar Link
 import Layout from '../components/Layout';
 import styles from '../css/ManagePages.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
 const ManagePages = () => {
     const [pages, setPages] = useState([]);
@@ -156,9 +158,16 @@ const ManagePages = () => {
                                     <td>{page.nombre}</td>
                                     <td>{page.estado ? 'Publicado' : 'Borrador'}</td>
                                     <td>
-                                        <button onClick={() => handleEdit(page)} className={styles.actionButton}>Editar</button>
-                                        <button onClick={() => handleDelete(page.id)} className={styles.actionButton}>Eliminar</button>
-                                        <Link to={`/page/${page.id}`} className={styles.actionButton}>Ver Página</Link>
+                                        <button onClick={() => handleEdit(page)} className={styles.actionButton}>
+                                            <FontAwesomeIcon icon={faEdit} />
+                                        </button>
+                                        <Link to={`/page/${page.id}`} className={styles.actionButton}>
+                                            <FontAwesomeIcon icon={faEye} />
+                                        </Link>
+                                        <button onClick={() => handleDelete(page.id)} className={styles.actionButton}>
+                                            <FontAwesomeIcon icon={faTrashAlt} />
+                                        </button>
+                                        
                                     </td>
                                 </tr>
                             ))

@@ -108,7 +108,7 @@ const ManageUsers = () => {
                     <tbody>
                         {users.length > 0 ? (
                             users.map(user => (
-                                <tr key={user.id}>
+                                <tr key={user.id}> {/* Corregido: la clave única es user.id */}
                                     <td>{user.username}</td>
                                     <td>{user.role}</td>
                                     <td>

@@ -22,7 +22,11 @@ def get_users(db: Session = Depends(get_db)):
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     # Hash de la contraseña antes de guardarla
     hashed_password = hash_password(user.password)
+    
+    # Creamos el nuevo usuario con su rol y la contraseña hasheada
     new_user = User(username=user.username, hashed_password=hashed_password, role=user.role)
+    
+    # Guardamos el nuevo usuario en la base de datos
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
