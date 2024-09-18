@@ -43,20 +43,15 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
     return new_user
 
-# Inicio de sesión y generación de token JWT
 @router.post("/login")
 def login(user_data: UserCreate, db: Session = Depends(get_db)):
+    print(f"Recibido en el backend: {user_data.username}, {user_data.password}")
+
     db_user = db.query(User).filter(User.username == user_data.username).first()
-    
-    # Imprime los detalles para asegurarte de que los datos son correctos
-    if db_user:
-        print(f"Usuario encontrado: {db_user.username}")
-        print(f"Contraseña hash en la base de datos: {db_user.hashed_password}")
-        print(f"Contraseña ingresada: {user_data.password}")
 
     if not db_user or not verify_password(user_data.password, db_user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
+
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": db_user.username, "role": db_user.role},
@@ -64,7 +59,6 @@ def login(user_data: UserCreate, db: Session = Depends(get_db)):
     )
     
     return {"access_token": access_token, "token_type": "bearer"}
-
 
 # Obtener usuario actual usando el token JWT
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):

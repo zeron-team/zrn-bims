@@ -1,7 +1,6 @@
 // frontend/src/context/AuthContext.js
 
-import React, { createContext, useState, useEffect } from 'react';
-import { login as loginService } from '../services/authService'; // Importamos el servicio de autenticación
+import React, { createContext, useState } from 'react';
 
 export const AuthContext = createContext();
 

@@ -15,14 +15,18 @@ const LoginPage = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        login(form.username, form.password)
-            .then(() => {
-                navigate('/dashboard'); // Redirigir al Dashboard después de iniciar sesión
-            })
-            .catch(error => {
-                console.error(error);
-                alert('Credenciales inválidas'); // Asegúrate de que esto solo aparezca si el error es real
-            });
+        if (form.username && form.password) {  // Verifica que ambos campos estén llenos
+            login(form.username, form.password)
+                .then(() => {
+                    navigate('/dashboard');
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert('Credenciales inválidas');
+                });
+        } else {
+            alert('Por favor, completa todos los campos.');
+        }
     };
 
     return (

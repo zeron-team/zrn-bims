@@ -5,7 +5,7 @@ from pydantic import BaseModel
 class UserCreate(BaseModel):
     username: str
     password: str
-    role: str  # Agregamos el campo de rol
+    role: str  # Asegúrate de que esto esté presente si es requerido
 
 class UserOut(BaseModel):
     username: str
