@@ -10,7 +10,7 @@ const Layout = ({ children }) => {
     const { user } = useContext(AuthContext);
     const [pages, setPages] = useState([]);
     const [showSubMenu, setShowSubMenu] = useState(false);
-    const [showAdminMenu, setShowAdminMenu] = useState(false); // Estado para submenú de Administración
+    const [showAdminMenu, setShowAdminMenu] = useState(false);
 
     useEffect(() => {
         getPages()
@@ -32,11 +32,10 @@ const Layout = ({ children }) => {
                 <h2 className={styles.menuTitle}>Menú</h2>
                 <nav className={styles.navMenu}>
                     <ul>
-                        {/* 1. Inicio */}
-                            <Link to="/dashboard" className={styles.navLink}>
-                                <i className="fas fa-home"></i> Inicio
-                            </Link>
-                        {/* 2. Páginas Nuevas */}
+                        <Link to="/dashboard" className={styles.navLink}>
+                            <i className="fas fa-home"></i> Inicio
+                        </Link>
+
                         <li className={styles.folder} onClick={toggleSubMenu}>
                             <div className={styles.folderTitle}>
                                 <i className="fas fa-folder"></i> Páginas Nuevas
@@ -57,7 +56,6 @@ const Layout = ({ children }) => {
                             )}
                         </ul>
 
-                        {/* 3. Administración */}
                         {user?.role === 'admin' && (
                             <>
                                 <li className={styles.folder} onClick={toggleAdminMenu}>
@@ -67,26 +65,25 @@ const Layout = ({ children }) => {
                                     <i className={`${styles.chevron} ${showAdminMenu ? 'fas fa-chevron-down' : 'fas fa-chevron-right'}`}></i>
                                 </li>
                                 <ul className={`${styles.subMenu} ${showAdminMenu ? styles.showSubMenu : ''}`}>
-                                    {/* 3A. Gestionar Páginas */}
-                                        <Link to="/manage-pages" className={styles.navLink}>
-                                            <i className="fas fa-folder-open"></i> Gestionar Páginas
-                                        </Link>
-                                    {/* 3B. Gestión de DB */}
-                                        <Link to="/manage-db" className={styles.navLink}>
-                                            <i className="fas fa-database"></i> Gestión de DB
-                                        </Link>
-                                    {/* 3C. Gestión de Usuarios */}
-                                        <Link to="/manage-users" className={styles.navLink}>
-                                            <i className="fas fa-users"></i> Gestión de Usuarios
-                                        </Link>
+                                    <Link to="/manage-pages" className={styles.navLink}>
+                                        <i className="fas fa-folder-open"></i> Gestionar Páginas
+                                    </Link>
+                                    <Link to="/manage-db" className={styles.navLink}>
+                                        <i className="fas fa-database"></i> Gestión de DB
+                                    </Link>
+                                    <Link to="/manage-queries" className={styles.navLink}>
+                                        <i className="fas fa-code"></i> Gestionar Consultas SQL
+                                    </Link>
+                                    <Link to="/manage-users" className={styles.navLink}>
+                                        <i className="fas fa-users"></i> Gestión de Usuarios
+                                    </Link>
                                 </ul>
                             </>
                         )}
 
-                        {/* 4. Cerrar Sesión */}
-                            <Link to="/login" className={styles.navLink}>
-                                <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
-                            </Link>
+                        <Link to="/login" className={styles.navLink}>
+                            <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </Link>
                     </ul>
                 </nav>
             </aside>

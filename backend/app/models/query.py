@@ -1,12 +1,13 @@
 # backend/app/models/query.py
 
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from app.core.database import Base
 
 class Query(Base):
     __tablename__ = "queries"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(255), nullable=True)  # Limita a 255 caracteres
-    query = Column(String(2000), nullable=False)  # Establece una longitud máxima, por ejemplo 2000 caracteres
-    connection_id = Column(Integer, ForeignKey("db_connections.id"), nullable=False)
+    connection_id = Column(Integer, ForeignKey('db_connections.id'))
+    query = Column(Text, nullable=False)
+    result = Column(Text)  # Define la columna result
+    name = Column(String, nullable=False, default="Unnamed Query")  # Define la columna name con valor predeterminado
