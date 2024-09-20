@@ -6,6 +6,7 @@ from typing import List, Any
 class QueryCreate(BaseModel):
     connection_id: int
     query: str
+    name: str = "Unnamed Query"  # Agregar un nombre por defecto a la consulta
 
 class QueryOut(BaseModel):
     id: int

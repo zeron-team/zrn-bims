@@ -8,6 +8,7 @@ import AdminPage from './pages/AdminPage';
 import ManageUsers from './pages/ManageUsers';
 import ManagePages from './pages/ManagePages';
 import ManageDB from './pages/ManageDB'; // Importar la nueva página
+import ManageQueries from './pages/ManageQueries'; // Asegúrate de importar esta página
 import Page1 from './pages/Page1';
 import Page2 from './pages/Page2';
 import DynamicPage from './pages/DynamicPage'; // Importar el componente para páginas dinámicas
@@ -28,6 +29,9 @@ function App() {
 
                     {/* Nueva ruta para la gestión de DB */}
                     <Route path="/manage-db" element={<PrivateRoute roles={['admin']}><ManageDB /></PrivateRoute>} />
+
+                    {/* Nueva ruta para la gestión de consultas SQL */}
+                    <Route path="/manage-queries" element={<PrivateRoute roles={['admin']}><ManageQueries /></PrivateRoute>} /> {/* Asegúrate de incluir esta ruta */}
 
                     <Route path="/page1" element={<PrivateRoute><Page1 /></PrivateRoute>} />
                     <Route path="/page2" element={<PrivateRoute><Page2 /></PrivateRoute>} />

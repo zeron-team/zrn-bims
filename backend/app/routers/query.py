@@ -9,7 +9,7 @@ from app.schemas.query import QueryCreate, QueryOut
 from app.models.db_connection import DBConnection
 
 router = APIRouter(
-    prefix="/api/queries",
+    prefix="/api/queries",  # Asegúrate de que esté correctamente definido
     tags=["queries"]
 )
 
@@ -33,7 +33,7 @@ def run_and_save_query(query_data: QueryCreate, db: Session = Depends(get_db)):
             rows = [dict(zip(columns, row)) for row in result]
 
         # Proporcionar un nombre predeterminado para la consulta si es necesario
-        query_name = query_data.query.split(' ')[0]  # Puedes personalizar el nombre según lo que necesites
+        query_name = query_data.name or query_data.query.split(' ')[0]  # Puedes personalizar el nombre según lo que necesites
 
         # Guardar la consulta en la base de datos
         new_query = Query(

@@ -1,6 +1,6 @@
 // frontend/src/pages/ManageQueries.js
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getQueries, runQuery } from '../services/queryService';
 import { getConnections } from '../services/dbService';
 import Layout from '../components/Layout';
@@ -10,21 +10,31 @@ const ManageQueries = () => {
     const [queries, setQueries] = useState([]);
     const [connections, setConnections] = useState([]);
     const [query, setQuery] = useState('');
+    const [queryName, setQueryName] = useState(''); // Nuevo campo para el nombre de la consulta
     const [selectedConnection, setSelectedConnection] = useState('');
-    const [result, setResult] = useState(null); // Store the result (columns and rows)
-    const [recordsToShow, setRecordsToShow] = useState(10); // Number of records to show
-    const [filteredRows, setFilteredRows] = useState([]); // Rows filtered by number of records
+    const [result, setResult] = useState(null); // Almacena el resultado (columnas y filas)
+    const [recordsToShow, setRecordsToShow] = useState(10); // Número de registros a mostrar
+    const [filteredRows, setFilteredRows] = useState([]); // Filas filtradas por número de registros
 
     useEffect(() => {
         fetchQueries();
         fetchConnections();
     }, []);
 
-    useEffect(() => {
+    // Definir la función con useCallback para asegurarse de que no cambie innecesariamente
+    const updateFilteredRows = useCallback(() => {
         if (result && result.rows) {
-            updateFilteredRows();
+            if (recordsToShow === 'total') {
+                setFilteredRows(result.rows);
+            } else {
+                setFilteredRows(result.rows.slice(0, recordsToShow));
+            }
         }
     }, [result, recordsToShow]);
+
+    useEffect(() => {
+        updateFilteredRows();
+    }, [result, recordsToShow, updateFilteredRows]);
 
     const fetchQueries = async () => {
         try {
@@ -46,9 +56,13 @@ const ManageQueries = () => {
 
     const handleRunQuery = async () => {
         try {
-            const response = await runQuery({ connection_id: selectedConnection, query });
-            setResult(response.data); // Store the columns and rows returned by the backend
-            fetchQueries();
+            const response = await runQuery({
+                connection_id: selectedConnection,
+                query,
+                name: queryName || "Unnamed Query" // Si no se proporciona nombre, usar valor por defecto
+            });
+            setResult(response.data); // Almacena las columnas y filas devueltas por el backend
+            fetchQueries(); // Actualiza la lista de consultas guardadas
         } catch (error) {
             console.error('Error running query', error.response ? error.response.data : error.message);
         }
@@ -56,16 +70,8 @@ const ManageQueries = () => {
 
     // Función para manejar el cambio en el número de registros a mostrar
     const handleRecordsToShowChange = (e) => {
-        setRecordsToShow(parseInt(e.target.value, 10) || 'total'); // Convertir a número o a 'total'
-    };
-
-    // Actualiza las filas que se muestran según la cantidad seleccionada
-    const updateFilteredRows = () => {
-        if (recordsToShow === 'total') {
-            setFilteredRows(result.rows);
-        } else {
-            setFilteredRows(result.rows.slice(0, recordsToShow));
-        }
+        const value = e.target.value === 'total' ? 'total' : parseInt(e.target.value, 10);
+        setRecordsToShow(value); // Establece el número de registros a mostrar
     };
 
     return (
@@ -82,6 +88,16 @@ const ManageQueries = () => {
                             </option>
                         ))}
                     </select>
+                </div>
+
+                <div className={styles.formGroup}>
+                    <label>Nombre de la Consulta:</label>
+                    <input
+                        type="text"
+                        value={queryName}
+                        onChange={(e) => setQueryName(e.target.value)}
+                        placeholder="Nombre descriptivo de la consulta"
+                    />
                 </div>
 
                 <div className={styles.formGroup}>
@@ -136,8 +152,8 @@ const ManageQueries = () => {
                 <ul className={styles.queryList}>
                     {queries.map(q => (
                         <li key={q.id}>
-                            <strong>{q.query}</strong>
-                            <pre>{q.result}</pre>
+                            <strong>{q.name || 'Unnamed Query'}:</strong>
+                            <pre>{q.query}</pre>
                         </li>
                     ))}
                 </ul>

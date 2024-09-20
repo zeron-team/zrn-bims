@@ -2,14 +2,7 @@
 
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api';  // Asegúrate de que esta URL sea la correcta para tu backend
+const API_URL = 'http://localhost:8000/api/queries';  // Asegúrate de que esta URL sea correcta
 
-// Ejecutar la consulta SQL
-export const executeQuery = (connectionId, query) => {
-    return axios.post(`${API_URL}/execute-query`, { connectionId, query });
-};
-
-// Guardar una consulta
-export const saveQuery = (queryDetails) => {
-    return axios.post(`${API_URL}/save-query`, queryDetails);
-};
+export const getQueries = () => axios.get(API_URL);
+export const runQuery = (data) => axios.post(`${API_URL}/run`, data);
