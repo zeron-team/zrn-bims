@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { getQueries, runQuery } from '../services/queryService';
-import { getCharts, createChart } from '../services/chartService';
+import { getCharts, createChart, updateChart, deleteChart } from '../services/chartService';
 import Layout from '../components/Layout';
 import styles from '../css/ManageCharts.module.css';
-import ChartRenderer from '../components/ChartRenderer'; // Importar ChartRenderer para mostrar el gráfico
+import ChartRenderer from '../components/ChartRenderer';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const ManageCharts = () => {
     const [queries, setQueries] = useState([]);
@@ -13,9 +15,11 @@ const ManageCharts = () => {
     const [chartType, setChartType] = useState('column');
     const [chartTitle, setChartTitle] = useState('');
     const [charts, setCharts] = useState([]);
-    const [queryResult, setQueryResult] = useState(null); // Resultado de la consulta seleccionada
-    const [xAxis, setXAxis] = useState(''); // Columna seleccionada para el eje X
-    const [yAxis, setYAxis] = useState(''); // Columna seleccionada para el eje Y
+    const [queryResult, setQueryResult] = useState(null);
+    const [xAxis, setXAxis] = useState('');
+    const [yAxis, setYAxis] = useState('');
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [chartToEdit, setChartToEdit] = useState(null);
 
     useEffect(() => {
         fetchQueries();
@@ -27,7 +31,7 @@ const ManageCharts = () => {
         try {
             const response = await getQueries();
             setQueries(response.data);
-            console.log("Consultas cargadas:", response.data); // Verifica las consultas cargadas
+            console.log("Consultas cargadas:", response.data);
         } catch (error) {
             console.error('Error fetching queries', error);
         }
@@ -46,67 +50,144 @@ const ManageCharts = () => {
     // Ejecutar consulta seleccionada y obtener datos
     const fetchQueryResult = async (queryId) => {
         try {
-            console.log("ID de consulta seleccionada:", queryId); // Verifica el ID seleccionado
-            const selectedQueryObj = queries.find(q => q.id === parseInt(queryId, 10)); // Asegúrate de que coincida el tipo de dato
-
+            console.log("ID de consulta seleccionada:", queryId);
+            const selectedQueryObj = queries.find(q => q.id === parseInt(queryId, 10));
+            
             if (!selectedQueryObj) {
                 console.error('No se encontró la consulta seleccionada.');
                 return;
             }
 
-            console.log("Consulta seleccionada:", selectedQueryObj); // Verifica el objeto de consulta seleccionado
+            console.log("Consulta seleccionada:", selectedQueryObj);
 
             if (!selectedQueryObj.connection_id) {
                 console.error('La consulta seleccionada no tiene un connection_id.');
                 return;
             }
 
+            // Ejecutar solo la consulta para obtener datos
             const response = await runQuery({
                 connection_id: selectedQueryObj.connection_id,
                 query: selectedQueryObj.query
             });
 
-            setQueryResult(response.data); // Almacenar resultado de la consulta
-            console.log("Resultado de la consulta:", response.data); // Verificar el resultado de la consulta
+            setQueryResult(response.data);
+            console.log("Resultado de la consulta:", response.data);
         } catch (error) {
             console.error('Error running query', error.response ? error.response.data : error.message);
         }
     };
 
-    // Crear un gráfico y guardarlo
-    const handleCreateChart = async () => {
+    // Crear o actualizar un gráfico
+    const handleSaveChart = async () => {
         if (!xAxis || !yAxis) {
-            alert('Selecciona tanto el eje X como el eje Y para crear el gráfico.');
-            return;
+           alert('Selecciona tanto el eje X como el eje Y para crear el gráfico.');
+           return;
         }
-    
+
         try {
-            const newChart = {
+            const chartDetails = {
                 query_id: selectedQuery,
                 chart_type: chartType,
-                chart_title: chartTitle,  // Asegúrate de enviar chart_title
+                chart_title: chartTitle,
                 chart_options: JSON.stringify({
                     xAxis: xAxis,
                     yAxis: yAxis
                 }),
-                chart_data: JSON.stringify(queryResult.rows.map(row => ({
-                    x: row[xAxis],
-                    y: row[yAxis]
-                })))  // Si deseas guardar datos específicos del gráfico
+                chart_data: ''  
             };
-            const response = await createChart(newChart);
-            console.log("Nuevo gráfico creado:", response.data);  // Muestra el nuevo gráfico creado
-            fetchCharts();  // Actualizar la lista de gráficos
+
+            if (isEditMode && chartToEdit) {
+                const response = await updateChart(chartToEdit.id, chartDetails);
+                console.log("Gráfico actualizado:", response.data);
+            } else {
+                const response = await createChart(chartDetails);
+                console.log("Nuevo gráfico creado:", response.data);
+            }
+
+            fetchCharts(); 
+            resetForm(); 
         } catch (error) {
-            console.error('Error creating chart', error.response ? error.response.data : error.message);
+            console.error('Error saving chart', error.response ? error.response.data : error.message);
         }
     };
-    
+
+    const resetForm = () => {
+        setSelectedQuery('');
+        setChartType('column');
+        setChartTitle('');
+        setXAxis('');
+        setYAxis('');
+        setIsEditMode(false);
+        setChartToEdit(null);
+        setQueryResult(null);
+    };
+
+    const handleDeleteChart = async (chartId) => {
+        if (window.confirm("¿Estás seguro de que deseas eliminar este gráfico?")) {
+            try {
+                await deleteChart(chartId);
+                fetchCharts(); 
+            } catch (error) {
+                console.error('Error deleting chart', error.response ? error.response.data : error.message);
+            }
+        }
+    };
+
+    const handleEditChart = (chart) => {
+        setIsEditMode(true);
+        setChartToEdit(chart);
+        setSelectedQuery(chart.query_id);
+        setChartType(chart.chart_type);
+        setChartTitle(chart.chart_title);
+
+        const chartOptions = JSON.parse(chart.chart_options);
+        setXAxis(chartOptions.xAxis);
+        setYAxis(chartOptions.yAxis);
+        fetchQueryResult(chart.query_id);
+    };
+
+    const handleViewChart = (chart) => {
+        handleEditChart(chart); // Reutilizamos la lógica de edición para cargar los datos del gráfico
+    };
+
+    const renderChartTable = () => (
+        <div className={styles.tableContainer}>
+            <table className={styles.chartTable}>
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Tipo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {charts.map(chart => (
+                        <tr key={chart.id}>
+                            <td>{chart.chart_title}</td>
+                            <td>{chart.chart_type}</td>
+                            <td className={styles.actionButtons}>
+                                <button onClick={() => handleViewChart(chart)} className={styles.iconButton}>
+                                    <FontAwesomeIcon icon={faEye} />
+                                </button>
+                                <button onClick={() => handleEditChart(chart)} className={styles.iconButton}>
+                                    <FontAwesomeIcon icon={faEdit} />
+                                </button>
+                                <button onClick={() => handleDeleteChart(chart.id)} className={styles.iconButton}>
+                                    <FontAwesomeIcon icon={faTrash} />
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
 
     return (
         <Layout>
             <div className={styles.container}>
-                <h2>Gestionar Gráficos</h2>
+                <h2>{isEditMode ? 'Editar Gráfico' : 'Gestionar Gráficos'}</h2>
                 <div className={styles.formGroup}>
                     <label htmlFor="querySelect">Seleccionar Consulta Guardada:</label>
                     <select
@@ -114,7 +195,7 @@ const ManageCharts = () => {
                         name="querySelect" 
                         onChange={(e) => {
                             setSelectedQuery(e.target.value);
-                            fetchQueryResult(e.target.value); // Obtener resultado de la consulta al seleccionar
+                            fetchQueryResult(e.target.value); 
                         }}
                         value={selectedQuery}
                     >
@@ -187,10 +268,15 @@ const ManageCharts = () => {
                         value={chartTitle}
                         onChange={(e) => setChartTitle(e.target.value)}
                         placeholder="Título descriptivo del gráfico"
-                        autoComplete="off" // Cambiado 'autocomplete' por 'autoComplete'
+                        autoComplete="off"
                     />
                 </div>
-                <button onClick={handleCreateChart} className={styles.createButton}>Crear Gráfico</button>
+                <button onClick={handleSaveChart} className={styles.createButton}>
+                    {isEditMode ? 'Actualizar Gráfico' : 'Crear Gráfico'}
+                </button>
+                <button onClick={resetForm} className={styles.cancelButton} style={{ marginLeft: '10px' }}>
+                    Cancelar
+                </button>
 
                 {queryResult && xAxis && yAxis && (
                     <div className={styles.chartPreview}>
@@ -213,13 +299,7 @@ const ManageCharts = () => {
                 )}
 
                 <h3>Gráficos Guardados</h3>
-                <ul className={styles.chartList}>
-                    {charts.map(chart => (
-                        <li key={chart.id}>
-                            <strong>{chart.name}:</strong> {chart.chart_type}
-                        </li>
-                    ))}
-                </ul>
+                {renderChartTable()}
             </div>
         </Layout>
     );

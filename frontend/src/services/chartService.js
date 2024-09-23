@@ -8,6 +8,11 @@ export const getCharts = () => axios.get(API_URL);
 
 export const createChart = (chartDetails) => axios.post(API_URL, chartDetails);
 
+export const deleteChart = (chartId) => axios.delete(`${API_URL}/${chartId}`);
+
+// Nueva función para actualizar un gráfico por ID
+export const updateChart = (chartId, chartDetails) => axios.put(`${API_URL}/${chartId}`, chartDetails);
+
 // Agregar la función getChartData si es necesaria
 export const getChartData = (page, token) => {
     return axios.get(`${API_URL}/data`, {
@@ -16,4 +21,3 @@ export const getChartData = (page, token) => {
         }
     });
 };
-

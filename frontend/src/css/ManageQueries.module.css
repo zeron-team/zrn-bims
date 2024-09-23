@@ -1,108 +1,78 @@
 /* frontend/src/css/ManageQueries.module.css */
-
-/* Estilos generales */
-.container {
-    max-width: 1200px; /* Aumenta el ancho para tablas grandes */
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f8f9fa; /* Color de fondo claro */
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    font-family: Arial, sans-serif; /* Fuente más profesional */
+.tableContainer {
+    margin-top: 20px;
+    overflow-x: auto;
 }
 
-/* Estilos para los grupos de formulario */
-.formGroup {
-    margin-bottom: 15px;
-}
-
-.formGroup label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #343a40; /* Color de texto oscuro */
-}
-
-textarea, input[type="text"], select {
+.queryTable {
     width: 100%;
-    padding: 10px;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.queryTable th, .queryTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.queryTable th {
+    background-color: #f4f4f4;
+    text-align: left;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 5px;
+}
+
+.iconButton {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
     font-size: 16px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
+    color: #007bff;
 }
 
-textarea {
-    height: 100px; /* Aumenta la altura del textarea */
+.iconButton:hover {
+    color: #0056b3;
 }
 
-/* Estilos para los botones */
-button {
+.runButton {
     padding: 10px 20px;
-    font-size: 16px;
-    background-color: #007bff;
+    background-color: #28a745;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin-right: 10px;
-    transition: background-color 0.3s ease;
+    margin-top: 10px;
 }
 
-button:hover {
-    background-color: #0056b3;
+.runButton:hover {
+    background-color: #218838;
 }
 
-/* Estilos para la tabla */
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background-color: #ffffff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.table th, .table td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #dee2e6; /* Línea de separación */
-}
-
-.table th {
-    background-color: #343a40; /* Color de fondo oscuro */
-    color: #ffffff; /* Color de texto blanco */
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-size: 14px;
-}
-
-.table tr:nth-child(even) {
-    background-color: #f8f9fa; /* Fondo alternado */
-}
-
-.table tr:hover {
-    background-color: #e9ecef; /* Fondo al pasar el cursor */
-}
-
-/* Estilos para la lista de consultas */
-.queryList {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0;
-}
-
-.queryList li {
-    background-color: #ffffff;
-    padding: 15px;
-    margin-bottom: 10px;
-    border: 1px solid #dee2e6;
+.cancelButton {
+    padding: 10px 20px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
     border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    margin-top: 10px;
 }
 
-.queryList li strong {
-    display: block;
-    margin-bottom: 5px;
-    color: #007bff; /* Color del nombre de la consulta */
+.cancelButton:hover {
+    background-color: #c82333;
+}
+
+.result {
+    margin-top: 20px;
+}
+.errorMessage {
+    color: #ff4d4f;
+    background-color: #fff1f0;
+    padding: 10px;
+    border: 1px solid #ff4d4f;
+    border-radius: 4px;
+    margin-bottom: 20px;
 }

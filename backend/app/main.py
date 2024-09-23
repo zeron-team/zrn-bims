@@ -2,28 +2,15 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, charts, admin, users, pages, query  # Importar correctamente todos los routers
-from app.models.page import Page  # Importa el modelo Page para la creación de la tabla
-from app.core.database import engine  # Importa el engine para la conexión de la base de datos
-from app.routers import db  # Importa tu router de la base de datos
+from app.routers import auth, charts, admin, users, pages, query, db
+from app.core.database import engine, Base
 
 app = FastAPI()
 
-# Crear instancia de la aplicación FastAPI
-app = FastAPI()
-
-# Crea las tablas en la base de datos si no existen
-Page.metadata.create_all(bind=engine)
-
-# Incluir el router de páginas correctamente
-app.include_router(pages.router)
+# Crear las tablas en la base de datos si no existen
+Base.metadata.create_all(bind=engine)
 
 # Configuración del middleware CORS
-origins = [
-    "http://localhost:3000",  # Frontend local en desarrollo
-    # Agregar otros orígenes permitidos, como dominios de producción
-]
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],  # Permitir solicitudes desde el frontend
@@ -32,13 +19,14 @@ app.add_middleware(
     allow_headers=["*"],  # Permitir todos los encabezados
 )
 
-# Incluir los routers de autenticación, gráficos, administración y usuarios
+# Incluir los routers después de configurar CORS
 app.include_router(auth.router)
 app.include_router(charts.router)
 app.include_router(admin.router)
-app.include_router(users.router)  # Asegúrate de incluir este router
-app.include_router(db.router) # Incluye el router
-app.include_router(query.router)  # Asegúrate de incluir el router de queries
+app.include_router(users.router)
+app.include_router(pages.router)
+app.include_router(db.router)
+app.include_router(query.router)
 
 # Endpoint básico para verificar que la API funciona
 @app.get("/")

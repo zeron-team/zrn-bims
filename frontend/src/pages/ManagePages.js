@@ -1,8 +1,8 @@
 // frontend/src/components/ManagePages.js
 
 import React, { useState, useEffect } from 'react';
-import { getPages, createPage, updatePage, deletePage } from '../services/pageService'; // Elimina la importación de 'getPage'
-import { Link } from 'react-router-dom'; // Asegúrate de importar Link
+import { getPages, createPage, updatePage, deletePage } from '../services/pageService';
+import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import styles from '../css/ManagePages.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,9 +10,16 @@ import { faEye, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
 const ManagePages = () => {
     const [pages, setPages] = useState([]);
-    const [form, setForm] = useState({ nombre: '', contenido: '', estado: false, url: '' }); // Incluye 'url'
-    const [pageUrl, setPageUrl] = useState(''); // Nueva URL de la página
-    const [errorMessage, setErrorMessage] = useState(''); // Para manejar errores
+    const [form, setForm] = useState({ 
+        nombre: '', 
+        descripcion: '', 
+        contenido: '', 
+        estado: false, 
+        url: '', 
+        estructura: { superior: 1, medio: 1, inferior: 1 }
+    });
+    const [pageUrl, setPageUrl] = useState(''); 
+    const [errorMessage, setErrorMessage] = useState(''); 
 
     useEffect(() => {
         fetchPages();
@@ -29,25 +36,52 @@ const ManagePages = () => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setForm({
-            ...form,
-            [name]: type === 'checkbox' ? checked : value
-        });
+        if (name.includes('estructura')) {
+            const [, key] = name.split('.'); 
+            setForm(prevForm => ({
+                ...prevForm,
+                estructura: {
+                    ...prevForm.estructura,
+                    [key]: parseInt(value, 10)
+                }
+            }));
+        } else {
+            setForm({
+                ...form,
+                [name]: type === 'checkbox' ? checked : value
+            });
+        }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setErrorMessage(''); // Reiniciar el mensaje de error
-        if (form.nombre.trim() === '' || form.contenido.trim() === '' || form.url.trim() === '') {
+        setErrorMessage(''); 
+        if (form.nombre.trim() === '' || form.contenido.trim() === '' || form.url.trim() === '' || form.descripcion.trim() === '') {
             setErrorMessage('Por favor completa todos los campos antes de enviar.');
             return;
         }
-
+    
+        const pageData = {
+            ...form,
+            estructura: {
+                superior: form.estructura.superior,
+                medio: form.estructura.medio,
+                inferior: form.estructura.inferior
+            }
+        };
+    
         if (form.id) {
-            updatePage(form.id, form)
+            updatePage(form.id, pageData)
                 .then(() => {
                     fetchPages();
-                    setForm({ nombre: '', contenido: '', estado: false, url: '' }); // Restablecer formulario
+                    setForm({ 
+                        nombre: '', 
+                        descripcion: '', 
+                        contenido: '', 
+                        estado: false, 
+                        url: '', 
+                        estructura: { superior: 1, medio: 1, inferior: 1 } 
+                    });
                     setErrorMessage('Página actualizada exitosamente.');
                 })
                 .catch(error => {
@@ -55,11 +89,18 @@ const ManagePages = () => {
                     setErrorMessage('Error al actualizar la página.');
                 });
         } else {
-            createPage(form)
+            createPage(pageData)
                 .then((response) => {
                     fetchPages();
-                    setForm({ nombre: '', contenido: '', estado: false, url: '' });
-                    setPageUrl(`/page/${response.data.id}`); // Establece la nueva URL
+                    setForm({ 
+                        nombre: '', 
+                        descripcion: '', 
+                        contenido: '', 
+                        estado: false, 
+                        url: '', 
+                        estructura: { superior: 1, medio: 1, inferior: 1 } 
+                    });
+                    setPageUrl(`/page/${response.data.id}`); 
                     setErrorMessage('Página creada exitosamente.');
                 })
                 .catch(error => {
@@ -74,7 +115,7 @@ const ManagePages = () => {
     };
 
     const handleDelete = (id) => {
-        setErrorMessage(''); // Reiniciar el mensaje de error
+        setErrorMessage(''); 
         deletePage(id)
             .then(() => {
                 fetchPages();
@@ -91,7 +132,6 @@ const ManagePages = () => {
             <div className={styles.container}>
                 <h2>Administrar Páginas</h2>
                 
-                {/* Mostrar mensaje de error o éxito */}
                 {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
 
                 <form onSubmit={handleSubmit} className={styles.form}>
@@ -114,6 +154,14 @@ const ManagePages = () => {
                         required
                     />
                     <textarea
+                        name="descripcion"
+                        placeholder="Descripción de la página"
+                        value={form.descripcion}
+                        onChange={handleChange}
+                        className={styles.textarea}
+                        required
+                    />
+                    <textarea
                         name="contenido"
                         placeholder="Contenido de la página"
                         value={form.contenido}
@@ -130,15 +178,43 @@ const ManagePages = () => {
                             onChange={handleChange}
                         />
                     </label>
+
+                    {/* Sección para configurar la estructura de cuadrantes */}
+                    <h3>Configurar Estructura de Cuadrantes</h3>
+                    <div className={styles.formGroup}>
+                        <label>Estructura Superior:</label>
+                        <select name="estructura.superior" value={form.estructura.superior} onChange={handleChange} className={styles.select}>
+                            <option value="1">1 Bloque</option>
+                            <option value="2">2 Bloques</option>
+                            <option value="3">3 Bloques</option>
+                            <option value="4">4 Bloques</option>
+                        </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label>Estructura Medio:</label>
+                        <select name="estructura.medio" value={form.estructura.medio} onChange={handleChange} className={styles.select}>
+                            <option value="1">1 Bloque</option>
+                            <option value="2">2 Bloques</option>
+                            <option value="3">3 Bloques</option>
+                        </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label>Estructura Inferior:</label>
+                        <select name="estructura.inferior" value={form.estructura.inferior} onChange={handleChange} className={styles.select}>
+                            <option value="1">1 Bloque</option>
+                            <option value="2">2 Bloques</option>
+                            <option value="3">3 Bloques</option>
+                        </select>
+                    </div>
+
                     <button type="submit" className={styles.button}>
                         {form.id ? 'Actualizar Página' : 'Agregar Página'}
                     </button>
                 </form>
 
-                {/* Mostrar la nueva URL si se ha creado o editado una página */}
                 {pageUrl && (
                     <p className={styles.successMessage}>
-                        Página disponible en: <Link to={pageUrl}>{pageUrl}</Link> {/* Usa Link para navegación interna */}
+                        Página disponible en: <Link to={pageUrl}>{pageUrl}</Link>
                     </p>
                 )}
 
@@ -178,6 +254,41 @@ const ManagePages = () => {
                         )}
                     </tbody>
                 </table>
+
+                {/* Vista previa de la estructura */}
+                <h3>Vista Previa de Estructura</h3>
+                <div className={styles.pagePreview}>
+                    <div className={styles.previewSection}>
+                        <h4>Superior ({form.estructura.superior} Bloques)</h4>
+                        <div className={styles.quadrants}>
+                            {[...Array(form.estructura.superior)].map((_, index) => (
+                                <div key={index} className={styles.quadrant}>
+                                    Bloque {index + 1}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className={styles.previewSection}>
+                        <h4>Medio ({form.estructura.medio} Bloques)</h4>
+                        <div className={styles.quadrants}>
+                            {[...Array(form.estructura.medio)].map((_, index) => (
+                                <div key={index} className={styles.quadrant}>
+                                    Bloque {index + 1}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className={styles.previewSection}>
+                        <h4>Inferior ({form.estructura.inferior} Bloques)</h4>
+                        <div className={styles.quadrants}>
+                            {[...Array(form.estructura.inferior)].map((_, index) => (
+                                <div key={index} className={styles.quadrant}>
+                                    Bloque {index + 1}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
         </Layout>
     );

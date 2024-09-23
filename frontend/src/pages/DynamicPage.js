@@ -3,42 +3,71 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import Layout from '../components/Layout';  // Asegúrate de que el Layout esté importado correctamente
-import styles from '../css/DynamicPage.module.css';  // Usa tu propio CSS si es necesario
+import Layout from '../components/Layout';
+import styles from '../css/PageView.module.css';
 
 const DynamicPage = () => {
-    const { id } = useParams();  // Obtiene el 'id' de la página desde la URL
-    const [page, setPage] = useState(null);  // Estado para almacenar la página cargada
-    const [error, setError] = useState(null);  // Estado para manejar errores
+    const { id } = useParams();  
+    const [page, setPage] = useState(null);  
+    const [error, setError] = useState(null);  
 
     useEffect(() => {
-        axios.get(`http://localhost:8000/api/pages/${id}`)  // Reemplaza con la URL de tu backend
+        axios.get(`http://localhost:8000/api/pages/${id}`)  
             .then(response => {
-                setPage(response.data);  // Almacena los datos de la página en el estado
+                console.log('Datos de la página:', response.data); // Verificamos los datos recibidos
+                setPage(response.data);  
             })
             .catch(error => {
-                setError("Error al cargar la página.");  // Manejador de errores
+                setError("Error al cargar la página.");  
                 console.error("Error al cargar la página:", error);
             });
     }, [id]);
 
     if (error) {
-        return <div>{error}</div>;  // Muestra error si ocurre
+        return <div>{error}</div>;  
     }
 
     if (!page) {
-        return <div>Cargando página...</div>;  // Muestra mensaje de carga mientras se obtienen los datos
+        return <div>Cargando página...</div>;  
     }
 
     return (
-        <Layout>  {/* Aquí envolvemos el contenido en el Layout */}
+        <Layout>
             <div className={styles.pageContainer}>
-                <h1>{page.nombre}</h1> {/* Título de la página */}
+                <h1>{page.nombre}</h1> 
+                <div className={styles.description}>{page.descripcion}</div> 
                 <div className={styles.content}>
-                    <div dangerouslySetInnerHTML={{ __html: page.contenido }} />  {/* Renderiza el contenido como HTML */}
+                    <div dangerouslySetInnerHTML={{ __html: page.contenido }} /> 
+                </div>
+                <div className={styles.structure}>
+                    {renderQuadrants('Superior', page.estructura?.superior || 0)}
+                    {renderQuadrants('Medio', page.estructura?.medio || 0)}
+                    {renderQuadrants('Inferior', page.estructura?.inferior || 0)}
                 </div>
             </div>
         </Layout>
+    );
+};
+
+const renderQuadrants = (sectionName, numberOfQuadrants) => {
+    console.log(`Rendering ${numberOfQuadrants} cuadrantes for ${sectionName}`); // Verificar qué se está intentando renderizar
+    if (numberOfQuadrants === 0) {
+        return null;
+    }
+
+    return (
+        <div className={styles.section}>
+            <h4>{sectionName} ({numberOfQuadrants} Bloque{numberOfQuadrants > 1 ? 's' : ''})</h4>
+            <div className={styles.quadrants}>
+                {[...Array(numberOfQuadrants)].map((_, index) => (
+                    <div key={index} className={styles.quadrant}>
+                        {/* Aquí agregamos contenido ficticio para verificar visualización */}
+                        <div>{sectionName} - Bloque {index + 1}</div>
+                        <div>Contenido del {sectionName} - Bloque {index + 1}</div>
+                    </div>
+                ))}
+            </div>
+        </div>
     );
 };
 

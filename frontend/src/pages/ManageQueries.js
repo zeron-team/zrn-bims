@@ -1,27 +1,27 @@
-// frontend/src/pages/ManageQueries.js
-
 import React, { useState, useEffect, useCallback } from 'react';
-import { getQueries, runQuery } from '../services/queryService';
+import { getQueries, runQuery, deleteQuery } from '../services/queryService'; // Importa deleteQuery
 import { getConnections } from '../services/dbService';
 import Layout from '../components/Layout';
 import styles from '../css/ManageQueries.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const ManageQueries = () => {
     const [queries, setQueries] = useState([]);
     const [connections, setConnections] = useState([]);
     const [query, setQuery] = useState('');
-    const [queryName, setQueryName] = useState(''); // Nuevo campo para el nombre de la consulta
+    const [queryName, setQueryName] = useState('');
     const [selectedConnection, setSelectedConnection] = useState('');
-    const [result, setResult] = useState(null); // Almacena el resultado (columnas y filas)
-    const [recordsToShow, setRecordsToShow] = useState(10); // Número de registros a mostrar
-    const [filteredRows, setFilteredRows] = useState([]); // Filas filtradas por número de registros
+    const [result, setResult] = useState(null);
+    const [recordsToShow, setRecordsToShow] = useState(10);
+    const [filteredRows, setFilteredRows] = useState([]);
+    const [errorMessage, setErrorMessage] = useState(''); // Estado para mensajes de error
 
     useEffect(() => {
         fetchQueries();
         fetchConnections();
     }, []);
 
-    // Definir la función con useCallback para asegurarse de que no cambie innecesariamente
     const updateFilteredRows = useCallback(() => {
         if (result && result.rows) {
             if (recordsToShow === 'total') {
@@ -42,6 +42,7 @@ const ManageQueries = () => {
             setQueries(response.data);
         } catch (error) {
             console.error('Error fetching queries', error);
+            setErrorMessage('Error al cargar las consultas.'); // Mensaje de error si falla la carga de consultas
         }
     };
 
@@ -51,33 +52,98 @@ const ManageQueries = () => {
             setConnections(response);
         } catch (error) {
             console.error('Error fetching connections', error);
+            setErrorMessage('Error al cargar las conexiones.'); // Mensaje de error si falla la carga de conexiones
         }
     };
 
     const handleRunQuery = async () => {
         try {
+            setErrorMessage(''); // Limpiar cualquier mensaje de error previo
             const response = await runQuery({
                 connection_id: selectedConnection,
                 query,
-                name: queryName || "Unnamed Query" // Si no se proporciona nombre, usar valor por defecto
+                name: queryName || "Unnamed Query"
             });
-            setResult(response.data); // Almacena las columnas y filas devueltas por el backend
+            setResult(response.data);
             fetchQueries(); // Actualiza la lista de consultas guardadas
         } catch (error) {
             console.error('Error running query', error.response ? error.response.data : error.message);
+            setErrorMessage('Error al ejecutar la consulta.'); // Mensaje de error si falla la ejecución de la consulta
         }
     };
 
     // Función para manejar el cambio en el número de registros a mostrar
     const handleRecordsToShowChange = (e) => {
         const value = e.target.value === 'total' ? 'total' : parseInt(e.target.value, 10);
-        setRecordsToShow(value); // Establece el número de registros a mostrar
+        setRecordsToShow(value);
     };
+
+    // Función para ver la consulta
+    const handleViewQuery = (query) => {
+        setQuery(query.query);
+        setQueryName(query.name);
+        setSelectedConnection(query.connection_id);
+    };
+
+    // Función para editar la consulta
+    const handleEditQuery = (query) => {
+        setQuery(query.query);
+        setQueryName(query.name);
+        setSelectedConnection(query.connection_id);
+    };
+
+    // Función para borrar la consulta
+    const handleDeleteQuery = async (queryId) => {
+        if (window.confirm("¿Estás seguro de que deseas eliminar esta consulta?")) {
+            try {
+                await deleteQuery(queryId); // Llamada al servicio con el ID correcto
+                setQueries(queries.filter(query => query.id !== queryId)); // Actualiza la lista en el estado
+            } catch (error) {
+                console.error('Error deleting query', error.response ? error.response.data : error.message);
+                setErrorMessage('Error al eliminar la consulta.'); // Mostrar mensaje de error
+            }
+        }
+    };
+
+    // Renderizar la tabla de consultas guardadas
+    const renderQueriesTable = () => (
+        <div className={styles.tableContainer}>
+            <table className={styles.queryTable}>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Consulta</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {queries.map(query => (
+                        <tr key={query.id}>
+                            <td>{query.name || 'Unnamed Query'}</td>
+                            <td><pre>{query.query}</pre></td>
+                            <td className={styles.actionButtons}>
+                                <button onClick={() => handleViewQuery(query)} className={styles.iconButton}>
+                                    <FontAwesomeIcon icon={faEye} />
+                                </button>
+                                <button onClick={() => handleEditQuery(query)} className={styles.iconButton}>
+                                    <FontAwesomeIcon icon={faEdit} />
+                                </button>
+                                <button onClick={() => handleDeleteQuery(query.id)} className={styles.iconButton}>
+                                    <FontAwesomeIcon icon={faTrash} />
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
 
     return (
         <Layout>
             <div className={styles.container}>
                 <h2>Gestionar Consultas SQL</h2>
+                {errorMessage && <div className={styles.errorMessage}>{errorMessage}</div>} {/* Mostrar error */}
                 <div className={styles.formGroup}>
                     <label>Seleccionar Conexión:</label>
                     <select onChange={(e) => setSelectedConnection(e.target.value)} value={selectedConnection}>
@@ -149,14 +215,7 @@ const ManageQueries = () => {
                 )}
 
                 <h3>Consultas Guardadas</h3>
-                <ul className={styles.queryList}>
-                    {queries.map(q => (
-                        <li key={q.id}>
-                            <strong>{q.name || 'Unnamed Query'}:</strong>
-                            <pre>{q.query}</pre>
-                        </li>
-                    ))}
-                </ul>
+                {renderQueriesTable()} {/* Renderizar la tabla de consultas guardadas */}
             </div>
         </Layout>
     );
