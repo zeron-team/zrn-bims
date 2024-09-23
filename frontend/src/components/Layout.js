@@ -74,6 +74,9 @@ const Layout = ({ children }) => {
                                     <Link to="/manage-queries" className={styles.navLink}>
                                         <i className="fas fa-code"></i> Gestionar Consultas SQL
                                     </Link>
+                                    <Link to="/manage-charts" className={styles.navLink}>
+                                        <i className="fas fa-chart-bar"></i> Gestionar Gráficos
+                                    </Link>
                                     <Link to="/manage-users" className={styles.navLink}>
                                         <i className="fas fa-users"></i> Gestión de Usuarios
                                     </Link>

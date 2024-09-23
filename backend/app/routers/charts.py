@@ -1,47 +1,41 @@
 # backend/app/routers/charts.py
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from app.core.database import get_db
+from app.models.chart import Chart
+from app.schemas.chart import ChartCreate, ChartOut
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from jose import JWTError, jwt
-from fastapi.security import OAuth2PasswordBearer
-from app.utils import SECRET_KEY, ALGORITHM
-
-# Definir el router para las rutas de gráficos
 router = APIRouter(
-    prefix="/charts",
+    prefix="/api/charts",
     tags=["charts"]
 )
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+@router.get("/", response_model=list[ChartOut])
+def get_charts(db: Session = Depends(get_db)):
+    charts = db.query(Chart).all()
+    return charts
 
-# Función para obtener el usuario actual a partir del token
-def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+@router.post("/", response_model=ChartOut)
+def create_chart(chart: ChartCreate, db: Session = Depends(get_db)):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        role: str = payload.get("role")
-        if username is None:
-            raise credentials_exception
-        return {"username": username, "role": role}
-    except JWTError:
-        raise credentials_exception
+        new_chart = Chart(
+            name=chart.chart_title,  # Aquí, name se establece como chart_title
+            query_id=chart.query_id,
+            chart_type=chart.chart_type,
+            chart_title=chart.chart_title,  # Asegúrate de pasar chart_title al modelo
+            chart_options=chart.chart_options,
+            chart_data=chart.chart_data  # Añadir chart_data si está disponible
+        )
+        db.add(new_chart)
+        db.commit()
+        db.refresh(new_chart)
+        return new_chart
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-# Función para verificar si el usuario es administrador
-def admin_required(current_user: dict = Depends(get_current_user)):
-    if current_user.get("role") != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
-    return current_user
-
-# Ruta protegida que solo pueden acceder los administradores
-@router.get("/admin-data")
-def get_admin_data(current_user: dict = Depends(admin_required)):
-    return {"message": f"Hello {current_user['username']}, you are an admin!"}
-
-# Ruta pública para obtener datos de gráficos
-@router.get("/")
-def get_chart():
-    return {"message": "This is a public chart endpoint"}
+@router.get("/{chart_id}", response_model=ChartOut)
+def get_chart(chart_id: int, db: Session = Depends(get_db)):
+    chart = db.query(Chart).filter(Chart.id == chart_id).first()
+    if not chart:
+        raise HTTPException(status_code=404, detail="Chart not found")
+    return chart

@@ -1,34 +1,38 @@
-//frontend/src/pages/Page2.js
+// frontend/src/pages/Page2.js
 
-import React, { useEffect, useState } from 'react'; // 'user' eliminado
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
-import { getChartData } from '../services/chartService';
+import React, { useState, useEffect } from 'react';
+import { getChartData } from '../services/chartService'; // Asegúrate de que getChartData esté definida
+import ChartRenderer from '../components/ChartRenderer'; // Asegúrate de que esta ruta sea correcta
+import Layout from '../components/Layout';
 
 const Page2 = () => {
-    const [options, setOptions] = useState({});
-    const token = localStorage.getItem('token');
+    const [chartData, setChartData] = useState(null);
 
     useEffect(() => {
-        getChartData('page2', token)
-            .then(response => {
-                const data = response.data;
-                setOptions({
-                    title: { text: data.title },
-                    xAxis: { categories: data.categories },
-                    series: [{ data: data.data, type: 'pie' }],
-                });
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    }, [token]);
+        // Suponiendo que el ID del gráfico a visualizar es 1, puedes cambiarlo según lo necesites
+        fetchChartData(1);
+    }, []);
+
+    const fetchChartData = async (chartId) => {
+        try {
+            const response = await getChartData(chartId);
+            setChartData(response.data);
+        } catch (error) {
+            console.error('Error fetching chart data', error);
+        }
+    };
 
     return (
-        <div>
-            <h2>Página 2 - {options.title}</h2>
-            <HighchartsReact highcharts={Highcharts} options={options} />
-        </div>
+        <Layout>
+            <div>
+                <h2>Gráfico Detallado</h2>
+                {chartData ? (
+                    <ChartRenderer chartData={chartData} />
+                ) : (
+                    <p>Cargando datos del gráfico...</p>
+                )}
+            </div>
+        </Layout>
     );
 };
 
